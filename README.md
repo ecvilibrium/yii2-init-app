@@ -2,7 +2,7 @@
     <a href="https://github.com/yiisoft" target="_blank">
         <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
     </a>
-    <h1 align="center">Yii 2 Advanced Project Template</h1>
+    <h1 align="center">Claim ASAP</h1>
     <br>
 </p>
 
@@ -21,40 +21,55 @@ Documentation is at [docs/guide/README.md](docs/guide/README.md).
 [![Total Downloads](https://img.shields.io/packagist/dt/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
 [![Build Status](https://travis-ci.org/yiisoft/yii2-app-advanced.svg?branch=master)](https://travis-ci.org/yiisoft/yii2-app-advanced)
 
-DIRECTORY STRUCTURE
+Local NGINX Config
 -------------------
 
 ```
-common
-    config/              contains shared configurations
-    mail/                contains view files for e-mails
-    models/              contains model classes used in both backend and frontend
-    tests/               contains tests for common classes    
-console
-    config/              contains console configurations
-    controllers/         contains console controllers (commands)
-    migrations/          contains database migrations
-    models/              contains console-specific model classes
-    runtime/             contains files generated during runtime
-backend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains backend configurations
-    controllers/         contains Web controller classes
-    models/              contains backend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for backend application    
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-frontend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains frontend configurations
-    controllers/         contains Web controller classes
-    models/              contains frontend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for frontend application
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-    widgets/             contains frontend widgets
-vendor/                  contains dependent 3rd-party packages
-environments/            contains environment-based overrides
+server {
+   charset utf-8;
+   listen 80;
+   listen [::]:80;
+#
+listen 443 ssl;
+listen [::]:443 ssl;
+#
+   root /var/www/claimasap;
+
+   # Add index.php to the list if you are using PHP
+   index index.html index.htm index.php;
+
+   server_name app.claimasap.com;
+#
+include snippets/self-signed.conf;
+include snippets/ssl-params.conf;
+#
+   access_log /var/log/nginx/claimasap-access.log;
+   error_log /var/log/nginx/claimasap-error.log warn;
+
+   location / {
+       root /var/www/claimasap/frontend/web;
+       try_files $uri /frontend/web/index.php?$args;
+   }
+   location ~ [^/]\.php(/|$) {
+       try_files $uri =404;
+       fastcgi_split_path_info ^(.+\.php)(/.+)$;
+       fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+       fastcgi_index index.php;
+       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+       include fastcgi_params;
+   }
+   location ~* \.(htaccess|htpasswd|svn|git) {
+       deny all;
+   }
+
+   location /admin {
+       alias /var/www/claimasap/backend/web;
+       try_files $uri /backend/web/index.php?args;
+   }
+#
+#   location ~* \.(css|js|png|eot|otf|ttf|woff|woff2|map)$ {
+#         add_header Access-Control-Allow-Origin *;
+#   }
+}
+
 ```
