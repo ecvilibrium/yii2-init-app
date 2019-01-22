@@ -39,10 +39,21 @@ class SetController extends Controller
         }
 
         if (Staff::find()->where(['role' => 'sadmin'])->exists()) {
-            echo "Super Admin account already exit";
+            echo "Super Admin account already exist";
             return ExitCode::OK;
+        } else {
+            $superAdmin = new Staff();
+            $superAdmin->username = $this->userName;
+            $superAdmin->role = 'sadmin';
+            $superAdmin->email = 'sadmin@test.com';
+            $superAdmin->setPassword($this->password);
+            $superAdmin->generateAuthKey();
+            if ($superAdmin->save() ){
+                echo "Account was created";
+                return ExitCode::OK;
+            } else {
+               echo 'error on save';
+            }
         }
-
-        echo $this->userName ."  -  ". $this->password;
     }
 }

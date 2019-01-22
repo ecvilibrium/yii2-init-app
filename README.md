@@ -73,3 +73,10 @@ include snippets/ssl-params.conf;
 }
 
 ```
+
+
+Create Super Admin Account
+-------------------
+```
+terminal: ./yii set -username=value -passwd=value
+```
